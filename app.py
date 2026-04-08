@@ -75,7 +75,7 @@ if st.button("Run", type="primary") or True:
 
     # --- Raw correlation table ---
     with st.expander("Raw correlation table"):
-        st.dataframe(corr.style.background_gradient(cmap="RdBu_r", vmin=-1, vmax=1).format("{:.4f}"))
+        st.dataframe(corr.round(4))
 
     # --- Price chart ---
     with st.expander("Normalized price chart (base = 100)"):
