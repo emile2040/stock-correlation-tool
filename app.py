@@ -38,7 +38,9 @@ if st.button("Run", type="primary") or True:
         st.stop()
 
     with st.spinner("Fetching price data..."):
-        raw = yf.download(tickers, start=start_date, end=end_date, auto_adjust=True, progress=False)
+        # auto_adjust=True: prices adjusted for dividends and all corporate actions (splits, spin-offs, etc.)
+        # repair=True: corrects bad data points reported by yfinance (e.g. 100x errors from missing split info)
+        raw = yf.download(tickers, start=start_date, end=end_date, auto_adjust=True, repair=True, progress=False)
 
     # Handle single vs multi-ticker response shape
     if isinstance(raw.columns, pd.MultiIndex):
@@ -62,6 +64,7 @@ if st.button("Run", type="primary") or True:
 
     # --- Heatmap ---
     st.subheader("Correlation Matrix")
+    st.caption("Based on daily total-return prices — adjusted for dividends, splits, and all corporate actions.")
     fig = px.imshow(
         corr,
         text_auto=".2f",
