@@ -112,12 +112,20 @@ if st.button("Run", type="primary") or True:
     with st.spinner(f"Fetching price data for {len(tickers)} tickers..."):
         prices = download_prices(tickers, start_date, end_date)
 
-    # Drop tickers with no data
+    # --- Data quality checks ---
+    # 1. Tickers that returned no data at all
     prices = prices.dropna(axis=1, how="all")
     missing = set(tickers) - set(prices.columns)
     if missing:
-        with st.expander(f"⚠️ {len(missing)} ticker(s) returned no data — click to see list"):
-            st.write(", ".join(sorted(missing)))
+        st.error(f"No data found for: **{', '.join(sorted(missing))}**. Check that these are valid Yahoo Finance tickers.")
+
+    # 2. Tickers with partial missing data (>5% NaN)
+    if not prices.empty:
+        pct_missing = prices.isnull().mean()
+        partial = pct_missing[pct_missing > 0.05]
+        if not partial.empty:
+            lines = [f"- **{t}**: {v:.1%} missing" for t, v in partial.items()]
+            st.warning("Some tickers have significant missing data and may skew results:\n" + "\n".join(lines))
 
     if prices.shape[1] < 2:
         st.error("Need at least 2 tickers with valid data.")
