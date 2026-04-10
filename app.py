@@ -81,11 +81,11 @@ with col5:
 with col6:
     lam = st.number_input(
         "Lambda",
-        min_value=0.0,
+        min_value=-1.0,
         max_value=1.0,
         value=0.0,
         step=0.05,
-        help="Adjusts correlations upward: new = corr + (1 − corr) × λ. At 0 = no adjustment, at 1 = all correlations become 1.",
+        help="Adjusts correlations: new = corr + (1 − corr) × λ. Positive = push toward 1, negative = push toward -1, 0 = no adjustment.",
     )
 
 # --- Fetch & compute ---
@@ -161,7 +161,7 @@ if st.button("Run", type="primary") or True:
         )
 
     # --- Lambda adjustment: corr + (1 - corr) * lambda ---
-    if lam > 0:
+    if lam != 0:
         corr = corr + (1 - corr) * lam
 
     # --- Heatmap ---
@@ -173,7 +173,7 @@ if st.button("Run", type="primary") or True:
     fig = px.imshow(
         corr,
         text_auto=".2f" if n <= 20 else False,
-        color_continuous_scale="RdBu_r",
+        color_continuous_scale="RdYlBu",
         zmin=-1, zmax=1,
         aspect="auto",
         labels={"color": "Correlation"},
